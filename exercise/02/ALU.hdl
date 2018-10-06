@@ -43,22 +43,50 @@ CHIP ALU {
 
     PARTS:
    // Put you code here:
-   Mux16(a=x, b=false, sel=zx, out=x1);
-   Not16(in=x1, out=notx1);
-   Mux16(a=x1, b=notx1, sel=nx, out=x2);
+   Mux16(a=x, b=false, sel=zx, out=l);
+   Not16(in=l, out=notl);
+   Mux16(a=l, b=notl, sel=nx, out=m);
 
-   Mux16(a=y, b=false, sel=zy, out=y1);
-   Not16(in=y1, out=noty1);
-   Mux16(a=y1, b=noty1, sel=ny, out=y2);
+   Mux16(a=y, b=false, sel=zy, out=n);
+   Not16(in=n, out=notn);
+   Mux16(a=n, b=notn, sel=ny, out=o);
 
-   Add16(a=x1, b=y1, out=sum);
-   And16(a=x1, b=y1, out=and);
+   And16(a=m, b=o, out=p);
+   Add16(a=m, b=o, out=q);
+   
+   Mux16(a=p, b=q, sel=f, out=r);
+   Not16(in=r, out=notr);
+   Mux16(a=r, b=notr, sel=no, out[15]=s, out[0..14]=t);
+   Mux16(a=r, b=notr, sel=no, out[0..7]=aa, out[8..15]=bb);
+   Or8Way(in=aa, out=xx);
+   Or8Way(in=bb, out=zz);
+   Or(a=xx, b=zz, out=yy);
+   Not(in=yy, out=zr);
+   Mux16(a=r, b=notr, sel=no, out=out);
+   Mux(a=false, b=true, sel=s, out=ng);
 
-   Mux16(a=sum, b=and, sel=f, out=o1);
-   Not16(in=o1, out=noto1);
-   Mux16(a=o1, b=noto1, sel=no, out=o2);
+   //Mux16(a=x, b=false, sel=zx, out=x1);     /* if zx then x=0 */
+   //Not16(in=x1, out=notx1);
+   //Mux16(a=x1, b=notx1, sel=nx, out=x2);    /* if nx then x=!x */
 
-   Or16way(in=o2, out=outzr);
-   Not16(in=outzr, out=zr);
-   And16(a=o2, b=);//未做完
+   //Mux16(a=y, b=false, sel=zy, out=y1);     /* if zy then y=0 */
+   //Not16(in=y1, out=noty1);
+   //Mux16(a=y1, b=noty1, sel=ny, out=y2);    /* if ny then y=!y */
+
+   //Add16(a=x2, b=y2, out=sum);
+   //And16(a=x2, b=y2, out=and);
+
+   //Mux16(a=sum, b=and, sel=f, out=o1);
+   //Not16(in=o1, out=noto1);
+   //Mux16(a=o1, b=noto1, sel=no, out=o2);    /* if no then out=!out */
+
+   //Or16way(in=o2, out=outzr);
+   //Not16(in=outzr, out=zr);
+   //And16(a=o2, b=);//未做完
+
+   //Mux(a=ture, b=false, sel=no, out=zr);    /* if out=0 then zr=1 else zr=0 */
+   //IsNeg16(in=o2, out=neg);
+   //Mux(a=false, b=true, sel=neg, out=ng);   /* if out<0 then ng=1 else ng=0 */
+   //Or16(a=o2, b=false, out=out);
+   
 }
