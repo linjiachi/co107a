@@ -15,11 +15,11 @@
 1    | [Mux8Way16](01/Mux8Way16.hdl)          |   2018/10/06
 1    | [DMux4Way](01/DMux4Way.hdl)            |   2018/10/06
 1    | [DMux8Way](01/DMux8Way.hdl)            |   2018/10/06
-2    | [HalfAdder](02/HalfAdder.hdl)          |
-2    | [FullAdder](02/FullAdder.hdl)          |
-2    | [Add16](02/Add16.hdl)                  |
-2    | [Inc16](02/Inc16.hdl)                  |
-2    | [ALU](02/ALU.hdl)                      |
+2    | [HalfAdder](02/HalfAdder.hdl)          |   2018/10/06
+2    | [FullAdder](02/FullAdder.hdl)          |   2018/10/06
+2    | [Add16](02/Add16.hdl)                  |   2018/10/06
+2    | [Inc16](02/Inc16.hdl)                  |   2018/10/06
+2    | [ALU](02/ALU.hdl)                      |   2018/10/06
 3    | [Bit](03/a/Bit.hdl)                    |
 3    | [Register](03/a/Register.hdl)          |
 3    | [RAM8](03/a/RAM8.hdl)                  |
