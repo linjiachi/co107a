@@ -23,7 +23,7 @@ CHIP PC {
     Mux16(a=incout,b=in,sel=load,out=jumpout);
     Mux16(a=jumpout,b=false,sel=reset,out=resetout);
     Or(a=load, b=reset, out=loadorreset);
-    Or(a=loadorreset, b=inc, out=work);
+    Or(a=loadorreset, b=inc, out=work);  //reset 和 load 皆 =0,inc 才會 +1
     Register(in=resetout,load=work,out=tempout);
     And16(a=tempout,b=tempout,out=out);
 }

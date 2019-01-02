@@ -13,6 +13,77 @@
 
 // Put your code here.
 
+// forever() {
+(forever)
+
+// scrAddr = RAM[SCREEN]
+@SCREEN
+D=A
+@scrAddr
+M=D
+
+// n = 8192
+@8192
+D=A
+@n
+M=D
+
+// i = 0
+@0
+D=A
+@i
+M=D
+
+// function loop() {
+// if((n-i) == 0) {goto end}
+@i
+D=M
+@n
+D=M-D
+@end
+D;JEQ
+
+// if (KBD == 0) {else()}
+@KBD
+D=M
+@else
+D;JEQ
+
+// if (KBD != 0 ) {RAM[scrAddr + i] = -1}
+@scrAddr
+D=M
+@i
+A=D+M
+M=-1
+
+// endif()
+@endif
+0;JEQ
+
+// function else()
+(else)
+@scrAddr
+D=M
+@i
+A=D+M
+M=0
+
+// function endif()
+@i
+M=M+1
+
+// loop()
+@loop
+0;JEQ
+
+// function end() {goto forever}
+(end)
+@forever
+0;JEQ
+
+
+
+
 // --------------------------
 // 類似 Ｃ語言的高階寫法
 // forever
@@ -44,63 +115,63 @@
 // goto FOREVER
 // --------------------------
 
-(FOREVER)
-// arr = SCREEN
-	@SCREEN
-	D=A
-	@arr
-	M=D
+//(FOREVER)
+/** arr = SCREEN
+*	@SCREEN
+*	D=A
+*	@arr
+*/	M=D
 
-// n=8192
-	@8192
-	D=A
-	@n
-	M=D
+/** n=8192
+*	@8192
+*	D=A
+*	@n
+*	M=D
 
-	@i
-	M=0
-(LOOP)
-  // if (i==n) goto ENDLOOP
-	@i
-	D=M
-	@n
-	D=D-M
-	@ENDLOOP
-	D; JEQ
+*	@i
+*/	M=0
+//(LOOP)
+  /* if (i==n) goto ENDLOOP
+*	@i
+*	D=M
+*	@n
+*	D=D-M
+*	@ENDLOOP
+*/	D; JEQ
 	
-  // if (*KBD != 0)
-	@KBD
-	D=M     // D = *KBD
-	@ELSE
-	D; JEQ  // if (*KDB==0) goto ELSE
-	
-	//   RAM[arr+i] = -1
-	@arr
-	D=M
-	@i
-	A=D+M
-	M=-1
-	
-	@ENDIF
-	0; JMP
-(ELSE)	
-  // else 
-  //   RAM[arr+i] = 0
-	@arr
-	D=M
-	@i
-	A=D+M
-	M=0
-	
-(ENDIF)
-	
-	// i++
-	@i
-	M=M+1
-	
-	@LOOP
-	0; JMP
-
-(ENDLOOP)
-	@FOREVER
-	0; JMP
+  /* if (*KBD != 0)
+*	@KBD
+*	D=M     // D = *KBD
+*	@ELSE
+*	D; JEQ  // if (*KDB==0) goto ELSE
+	*
+	*/   RAM[arr+i] = -1
+*	@arr
+*	D=M
+*	@i
+*	A=D+M
+*	M=-1
+*	
+*	@ENDIF
+*	0; JMP
+*(ELSE)	
+*  // else 
+*  //   RAM[arr+i] = 0
+*	@arr
+*	D=M
+*	@i
+*	A=D+M
+*	M=0
+*	
+*(ENDIF)
+*	
+*	// i++
+*	@i
+*	M=M+1
+*	
+*	@LOOP
+*	0; JMP
+*
+*(ENDLOOP)
+*	@FOREVER
+*/	0; JMP
