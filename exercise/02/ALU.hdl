@@ -43,90 +43,30 @@ CHIP ALU {
 
     PARTS:
    // Put you code here:
-   Mux16(a=x, b=false, sel=zx, out=l);
-   Not16(in=l, out=notl);
-   Mux16(a=l, b=notl, sel=nx, out=m);
+   Mux16(a=x, b=false, sel=zx, out=zerox); // if zx (x = 0)
+   Not16(in=zerox, out=notx);              // if nx (x = !x)
+   Mux16(a=zerox, b=notx, sel=nx, out=xornotx);
 
-   Mux16(a=y, b=false, sel=zy, out=n);
-   Not16(in=n, out=notn);
-   Mux16(a=n, b=notn, sel=ny, out=o);
+   Mux16(a=y, b=false, sel=zy, out=zeroy); // if zy (y = 0)
+   Not16(in=zeroy, out=noty);              // if ny (y = !y)
+   Mux16(a=zeroy, b=noty, sel=ny, out=yornoty);
 
-   And16(a=m, b=o, out=p);
-   Add16(a=m, b=o, out=q);
+   And16(a=xornotx, b=yornoty, out=xandy); //x+y
+   Add16(a=xornotx, b=yornoty, out=xaddy); //x&y
    
-   Mux16(a=p, b=q, sel=f, out=r);
-   Not16(in=r, out=notr);
-   Mux16(a=r, b=notr, sel=no, out[15]=s, out[0..14]=t);
-   Mux16(a=r, b=notr, sel=no, out[0..7]=aa, out[8..15]=bb);
-   Or8Way(in=aa, out=xx);
-   Or8Way(in=bb, out=zz);
-   Or(a=xx, b=zz, out=yy);
-   Not(in=yy, out=zr);
-   Mux16(a=r, b=notr, sel=no, out=out);
-   Mux(a=false, b=true, sel=s, out=ng);
+   Mux16(a=xandy, b=xaddy, sel=f, out=xandyorxaddy);
+   Not16(in=xandyorxaddy, out=notxandyorxaddy);  // if no (out = !out)
+   Mux16(a=xandyorxaddy, b=notxandyorxaddy, sel=no, out=o); 
+   And16(a=o, b=o, out[0..7]=outlow, our[8..15]=outhigh);
 
+    //if out=0 then zr=1 else zr=0
+   Or8Way(in=outlow, out=orlow);
+   Or8Way(in=outhigh, out=orhigh);
+   Or(a=orlow, b=orhigh, out=notzr);
+   Not(in=notzr, out=zr);
 
-    // if zx {x = 0}
-   //Mux16(a=x, b=false, sel=zx, out=zx1);
-
-    // if nx {x = !x}
-   //Not16(in=zx1, out=zx2);
-   //Mux16(a=zx1, b=zx2, sel=nx, out=nx1);
-
-    // if (zy) {y = 0}
-   //Mux16(a=y, b=false, sel=zy, out=zy1);
-
-    // if (ny) {y = !y}
-   //Not16(in=zy1, out=zy2);
-   //Mux16(a=zy1, b=zy2, sel=ny, out=ny1);
-
-    // if (f) {out = x + y} else {out = x & y}
-   //Add16(a=nx1, b=ny1, out=addxy);
-   //And16(a=nx1, b=ny1, out=andxy);
-   //Mux16(a=andxy, b=addxy, sel=f, out=fxy);
-
-    // if (no) {out = !out}
-
-   //Not16(in=fxy, out=fxy1);
-   //Mux16(a=fxy, b=fxy1, sel=no, out[0..7]=o1, out[8..15]=o2, out[15]=ng, out=out);
-
-    // if (out == 0) {zr = 1} else {zr = 0}
-   //Or8Way(in=o1, out=Oo1);
-   //Or8Way(in=o2, out=Oo2);
-   //Or(a=Oo1, b=Oo2, out=Oo3);
-   //Not(in=Oo3, out=zr);
-
-   // if (out < 0) {ng = 1} else {ng = 0}
-   // if (out[15] = 1) {ng = 1} else {ng = 0}
-   // And(a=o3,b=o3,out=ng1);
-   // Mux(a=false,b=true,sel=ng1,out=ng);
-
-
-
-   //Mux16(a=x, b=false, sel=zx, out=x1);     /* if zx then x=0 */
-   //Not16(in=x1, out=notx1);
-   //Mux16(a=x1, b=notx1, sel=nx, out=x2);    /* if nx then x=!x */
-
-   //Mux16(a=y, b=false, sel=zy, out=y1);     /* if zy then y=0 */
-   //Not16(in=y1, out=noty1);
-   //Mux16(a=y1, b=noty1, sel=ny, out=y2);    /* if ny then y=!y */
-
-   //Add16(a=x2, b=y2, out=sum);
-   //And16(a=x2, b=y2, out=and);
-
-   //Mux16(a=sum, b=and, sel=f, out=o1);
-   //Not16(in=o1, out=noto1);
-   //Mux16(a=o1, b=noto1, sel=no, out=o2);    /* if no then out=!out */
-
-   //Or16way(in=o2, out=outzr);
-   //Not16(in=outzr, out=zr);
-   //And16(a=o2, b=);//未做完
-
-   //Mux(a=ture, b=false, sel=no, out=zr);    /* if out=0 then zr=1 else zr=0 */
-   //IsNeg16(in=o2, out=neg);
-   //Mux(a=false, b=true, sel=neg, out=ng);   /* if out<0 then ng=1 else ng=0 */
-   //Or16(a=o2, b=false, out=out);
-   
-
-
+    //if out<0 then ng=1 else ng=0
+    //if out[15] = 1 then ng = 1 else ng = 0
+   Mux16(a=o, b=o, out[15]=ng);
+   Or16(a=o, b=false, out=out);
 }

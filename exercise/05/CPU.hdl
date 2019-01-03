@@ -42,13 +42,13 @@ CHIP CPU {
     // Put your code here:
 
     // A Register
-    Not(in=instruction[15],out=isA); // i[15] = 0 => isA
-    Not(in=isA,out=isC); // i[15] = 1 => isC
+    Not(in=instruction[15],out=isA);   // i[15] = 0 => isA
+    Not(in=isA,out=isC);               // i[15] = 1 => isC
+    And(a=isC,b=instruction[5],out=ALUtoA); 
     Mux16(a=instruction,b=ALUout,sel=isC,out=Ain);
-    And(a=isC,b=instruction[5],out=ALUtoA);
     Or(a=isA,b=ALUtoA,out=Aload);
 
-    ARegister(in=Ain,load=Aload,out=Aout,out[0..14]=addressM);
+    ARegister(in=Ain,load=Aload,out=Aout);
 
     // D Register
     And(a=isC,b=instruction[4],out=Dload);
@@ -56,23 +56,24 @@ CHIP CPU {
 
     // ALU
     Mux16(a=Aout,b=inM,sel=instruction[12],out=AorM);
-    ALU(x=Dout,y=AorM,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6],out=ALUout,out=outM,zr=zr,ng=ng);
+    ALU(x=Dout,y=AorM,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6],out=ALUout,zr=zr,ng=ng);
+
+    Or16(a=ALUout,b=false,out=outM);
+    Or16(a=Aout,b=false,out[0..14]=addressM);
+    And(a=isC,b=instruction[3],out=writeM);
 
     // Destination
-    And(a=ng,b=instruction[2],out=ngPass);
-    And(a=zr,b=instruction[1],out=eqPass);
+    And(a=zr,b=instruction[1],out=JEQ); //若輸出為 0 且 j2 為 1,跳躍指令為JEQ(X=0) 
+    And(a=ng,b=instruction[2],out=JLT); //若輸出小於 0 且 j1 為 1,跳躍指令為JLT(X<0)
+    
+    Or(a=zr,b=ng,out=zrorng);
+    Not(in=zrorng,out=N);  //若不等於0或不小於0,則為正數
+    And(a=N,b=instruction[0],out=JGT); //若輸出為正且 j0 為 1,跳躍指令為JGT(X>0)
 
-    // (x < 0) || (x = 0) 等價於 x > 0
-    // 注意中間是 Or，並不是 And
-    Or(a=ng,b=zr,out=ngorzr); // !!!!!
-    Not(in=ngorzr,out=gt);
-    And(a=gt,b=instruction[0],out=gtPass);
+    Or(a=JEQ,b=JLT,out=JLE); //若輸出為0或小於0,跳躍指令為JLE(X<=0)
+    Or(a=JLE,b=JGT,out=JMPtoA); //若輸出小於,等於或大於0,跳躍指令為JMP
+    And(a=isC,b=JMPtoA,out=PCload); //若為C指令，並且有JMP指令時，PC載入
 
-    Or(a=ngPass,b=eqPass,out=elPass);
-    Or(a=elPass,b=gtPass,out=allPass);
-    And(a=isC,b=allPass,out=PCload);
-
-    // Output
-    PC(in=Aout,load=PCload,inc=true,reset=reset,out[0..14]=pc);
-    And(a=isC,b=instruction[3],out=writeM);
+    Not(in=PCload,out=PCinc); 
+    PC(in=Aout,load=PCload,inc=PCinc,reset=reset,out[0..14]=pc);
 }
